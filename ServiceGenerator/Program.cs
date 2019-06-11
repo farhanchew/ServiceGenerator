@@ -36,7 +36,15 @@ namespace ServiceGenerator
             {
                 string contents = File.ReadAllText(file.FullName);
                 string[] lines = contents.Replace("\r", "").Split('\n');
-                Console.Write(contents);
+                if(string.IsNullOrEmpty(OriginNamespace))
+                {
+                    var nspace = lines.Where(x => x.Contains("namespace")).FirstOrDefault();
+                    if(!string.IsNullOrEmpty(nspace))
+                    {
+                        OriginNamespace = nspace.Replace("namespace ", string.Empty);
+                        Console.WriteLine($"Origin Namespace : {OriginNamespace}");
+                    }
+                }
             }
         }
 
