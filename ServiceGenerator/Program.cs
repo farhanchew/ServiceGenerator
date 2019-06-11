@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace ServiceGenerator
 {
@@ -11,6 +12,8 @@ namespace ServiceGenerator
         public static string TargetNamespace = "";
         public static DirectoryInfo DirectoryInfo;
         public static FileInfo[] Files;
+        public static string ClassName;
+
         static void Main(string[] args)
         {
 
@@ -44,7 +47,11 @@ namespace ServiceGenerator
                         OriginNamespace = nspace.Replace("namespace ", string.Empty);
                         Console.WriteLine($"Origin Namespace : {OriginNamespace}");
                     }
+
                 }
+                var output = new StringBuilder();
+                output.AppendLine($"using {OriginNamespace};");
+                output.AppendLine($"using System.Threading.Tasks;");
             }
         }
 
