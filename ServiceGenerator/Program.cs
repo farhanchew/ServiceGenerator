@@ -8,8 +8,7 @@ namespace ServiceGenerator
     class Program
     {
         public static string Path = "";
-        public static string OriginNamespace = "";
-        public static string TargetNamespace = "";
+        //public static string OriginNamespace = "";
         public static DirectoryInfo DirectoryInfo;
         public static FileInfo[] Files;
         public static string ClassName;
@@ -39,19 +38,8 @@ namespace ServiceGenerator
             {
                 string contents = File.ReadAllText(file.FullName);
                 string[] lines = contents.Replace("\r", "").Split('\n');
-                if(string.IsNullOrEmpty(OriginNamespace))
-                {
-                    var nspace = lines.Where(x => x.Contains("namespace")).FirstOrDefault();
-                    if(!string.IsNullOrEmpty(nspace))
-                    {
-                        OriginNamespace = nspace.Replace("namespace ", string.Empty);
-                        Console.WriteLine($"Origin Namespace : {OriginNamespace}");
-                    }
 
-                }
                 var output = new StringBuilder();
-                output.AppendLine($"using {OriginNamespace};");
-                output.AppendLine($"using System.Threading.Tasks;");
             }
         }
 
