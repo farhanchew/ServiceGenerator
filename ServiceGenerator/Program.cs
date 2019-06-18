@@ -22,7 +22,7 @@ namespace ServiceGenerator
 
             try
             {
-                Console.WriteLine("Enter Domain/Model Path");
+                Console.WriteLine("Enter DbContext Path");
                 Path = Console.ReadLine();
                 GenerateService();
             }
@@ -95,6 +95,8 @@ namespace ServiceGenerator
                     var output = new StringBuilder();
                     output.AppendLine("    public class [Entity]Service");
                     output.AppendLine("    {");
+
+                    //Get All
                     output.AppendLine("        public static async Task<(List<[Entity]>,string)> GetAll[Plural]([ContextClass] db, bool include = false)");
                     output.AppendLine("        {");
                     output.AppendLine("            try");
@@ -113,6 +115,8 @@ namespace ServiceGenerator
                     output.AppendLine("            }");
                     output.AppendLine("        }");
                     output.AppendLine("");
+
+                    //Get by predicate
                     output.AppendLine("        public static async Task<(List<[Entity]>,string)> Get[Plural]([ContextClass] db, Expression<Func<[Entity], bool>> predicate, bool include = false)");
                     output.AppendLine("        {");
                     output.AppendLine("            try");
@@ -120,7 +124,6 @@ namespace ServiceGenerator
                     output.AppendLine("                var results = include ? await db.[Plural].Where(predicate)");
                     output.AppendLine("                    .ToListAsync()");
                     output.AppendLine("                    : await db.[Plural].Where(predicate).ToListAsync();");
-                    output.AppendLine("");
                     output.AppendLine("                return (results, string.Empty);");
                     output.AppendLine("            }");
                     output.AppendLine("            catch (Exception ex)");
@@ -129,7 +132,9 @@ namespace ServiceGenerator
                     output.AppendLine("            }");
                     output.AppendLine("        }");
                     output.AppendLine("");
-                    output.AppendLine("        public static async Task<([Entity],string)> Get[Entity]([ContextClass] db, int id, bool include = false)");
+
+                    //Get by Id
+                    output.AppendLine("        public static async Task<([Entity],string)> Get[Entity]ById([ContextClass] db, int id, bool include = false)");
                     output.AppendLine("        {");
                     output.AppendLine("            try");
                     output.AppendLine("            {");
@@ -146,13 +151,15 @@ namespace ServiceGenerator
                     output.AppendLine("            }");
                     output.AppendLine("        }");
                     output.AppendLine("");
+
+                    //Insert Single
                     output.AppendLine("        public static async Task<([Entity], string)> Insert[Entity]([ContextClass] db, [Entity] model)");
                     output.AppendLine("        {");
                     output.AppendLine("            try");
                     output.AppendLine("            {");
                     output.AppendLine("                await db.[Plural].AddAsync(model);");
                     output.AppendLine("                await db.SaveChangesAsync();");
-                    output.AppendLine("                return (result, string.Empty);");
+                    output.AppendLine("                return (model, string.Empty);");
                     output.AppendLine("            }");
                     output.AppendLine("            catch (Exception ex)");
                     output.AppendLine("            {");
@@ -160,6 +167,24 @@ namespace ServiceGenerator
                     output.AppendLine("            }");
                     output.AppendLine("        }");
                     output.AppendLine("");
+
+                    //Insert Range
+                    output.AppendLine("        public static async Task<([Entity], string)> Insert[Plural]([ContextClass] db, IEnumerable<[Entity]> model)");
+                    output.AppendLine("        {");
+                    output.AppendLine("            try");
+                    output.AppendLine("            {");
+                    output.AppendLine("                await db.[Plural].AddRangeAsync(model);");
+                    output.AppendLine("                await db.SaveChangesAsync();");
+                    output.AppendLine("                return (model, string.Empty);");
+                    output.AppendLine("            }");
+                    output.AppendLine("            catch (Exception ex)");
+                    output.AppendLine("            {");
+                    output.AppendLine("                return (null,ex.Message);");
+                    output.AppendLine("            }");
+                    output.AppendLine("        }");
+                    output.AppendLine("");
+
+                    //Update Single
                     output.AppendLine("        public static async Task<([Entity],string)> Update[Entity]([ContextClass] db, [Entity] model)");
                     output.AppendLine("        {");
                     output.AppendLine("            try");
@@ -174,11 +199,45 @@ namespace ServiceGenerator
                     output.AppendLine("            }");
                     output.AppendLine("        }");
                     output.AppendLine("");
+
+                    //Update Range
+                    output.AppendLine("        public static async Task<([Entity],string)> Update[Plural]([ContextClass] db, IEnumerable<[Entity]> model)");
+                    output.AppendLine("        {");
+                    output.AppendLine("            try");
+                    output.AppendLine("            {");
+                    output.AppendLine("                db.[Plural].UpdateRange(model);");
+                    output.AppendLine("                await db.SaveChangesAsync();");
+                    output.AppendLine("                return (model, string.Empty);");
+                    output.AppendLine("            }");
+                    output.AppendLine("            catch (Exception ex)");
+                    output.AppendLine("            {");
+                    output.AppendLine("                return (null,ex.Message);");
+                    output.AppendLine("            }");
+                    output.AppendLine("        }");
+                    output.AppendLine("");
+
+                    //Delete Single
                     output.AppendLine("        public static async Task<(bool, string)> Delete[Entity]([ContextClass] db, [Entity] model)");
                     output.AppendLine("        {");
                     output.AppendLine("            try");
                     output.AppendLine("            {");
                     output.AppendLine("                db.[Plural].Remove(model);");
+                    output.AppendLine("                await db.SaveChangesAsync();");
+                    output.AppendLine("                return (true, string.Empty);");
+                    output.AppendLine("            }");
+                    output.AppendLine("            catch (Exception ex)");
+                    output.AppendLine("            {");
+                    output.AppendLine("                return (false,ex.Message);");
+                    output.AppendLine("            }");
+                    output.AppendLine("        }");
+                    output.AppendLine("");
+
+                    //Delete Range
+                    output.AppendLine("        public static async Task<(bool, string)> Delete[Plural]([ContextClass] db, IEnumerable<[Entity]> model)");
+                    output.AppendLine("        {");
+                    output.AppendLine("            try");
+                    output.AppendLine("            {");
+                    output.AppendLine("                db.[Plural].RemoveRange(model);");
                     output.AppendLine("                await db.SaveChangesAsync();");
                     output.AppendLine("                return (true, string.Empty);");
                     output.AppendLine("            }");
