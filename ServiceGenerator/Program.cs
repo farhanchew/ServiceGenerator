@@ -17,6 +17,8 @@ namespace ServiceGenerator
         public static string Plural;
         public static string ContextClass;
 
+        public static string NamespaceName;
+
         static void Main(string[] args)
         {
 
@@ -24,6 +26,11 @@ namespace ServiceGenerator
             {
                 Console.WriteLine("Enter DbContext Path");
                 Path = Console.ReadLine();
+                Console.WriteLine("Enter Namespace Name, (namespace wont generate if empty)");
+                Console.WriteLine("Tags can be used : [Entity]");
+                Console.WriteLine("Example: ProjectName.Application.[Entity].Service");
+                Console.WriteLine("Example: ProjectName.Application.Service");
+                NamespaceName = Console.ReadLine();
                 GenerateService();
             }
             catch (Exception excpt)
@@ -70,6 +77,7 @@ namespace ServiceGenerator
                         .Replace("private", string.Empty)
                         .Replace("protected", string.Empty)
                         .Replace("partial", string.Empty)
+                        .Replace("virtual", string.Empty)
                         .Replace("class", string.Empty)
                         .Replace("sealed", string.Empty)
                         .Replace("DbSet<",string.Empty)
@@ -93,6 +101,19 @@ namespace ServiceGenerator
                     
 
                     var output = new StringBuilder();
+                    if(!string.IsNullOrEmpty(NamespaceName))
+                    {
+                        output.AppendLine("using System;                       ");
+                        output.AppendLine("using System.Threading.Tasks;       ");
+                        output.AppendLine("using System.Collections.Generic;   ");
+                        output.AppendLine("using System.Linq;                  ");
+                        output.AppendLine("using System.Linq.Expressions;      ");
+                        output.AppendLine("using Microsoft.EntityFrameworkCore;");
+                        output.AppendLine("");
+                        output.AppendLine($"namespace {NamespaceName}");
+                        output.AppendLine("{");
+
+                    }
                     output.AppendLine("    public class [Entity]Service");
                     output.AppendLine("    {");
 
@@ -169,7 +190,7 @@ namespace ServiceGenerator
                     output.AppendLine("");
 
                     //Insert Range
-                    output.AppendLine("        public static async Task<([Entity], string)> Insert[Plural]([ContextClass] db, IEnumerable<[Entity]> model)");
+                    output.AppendLine("        public static async Task<(IEnumerable<[Entity]>, string)> Insert[Plural]Range([ContextClass] db, IEnumerable<[Entity]> model)");
                     output.AppendLine("        {");
                     output.AppendLine("            try");
                     output.AppendLine("            {");
@@ -201,7 +222,7 @@ namespace ServiceGenerator
                     output.AppendLine("");
 
                     //Update Range
-                    output.AppendLine("        public static async Task<([Entity],string)> Update[Plural]([ContextClass] db, IEnumerable<[Entity]> model)");
+                    output.AppendLine("        public static async Task<(IEnumerable<[Entity]>,string)> Update[Plural]Range([ContextClass] db, IEnumerable<[Entity]> model)");
                     output.AppendLine("        {");
                     output.AppendLine("            try");
                     output.AppendLine("            {");
@@ -233,7 +254,7 @@ namespace ServiceGenerator
                     output.AppendLine("");
 
                     //Delete Range
-                    output.AppendLine("        public static async Task<(bool, string)> Delete[Plural]([ContextClass] db, IEnumerable<[Entity]> model)");
+                    output.AppendLine("        public static async Task<(bool, string)> Delete[Plural]Range([ContextClass] db, IEnumerable<[Entity]> model)");
                     output.AppendLine("        {");
                     output.AppendLine("            try");
                     output.AppendLine("            {");
@@ -247,7 +268,11 @@ namespace ServiceGenerator
                     output.AppendLine("            }");
                     output.AppendLine("        }");
                     output.AppendLine("    }");
-
+                    if (!string.IsNullOrEmpty(NamespaceName))
+                    {
+                        output.AppendLine("");
+                        output.AppendLine("}");
+                    }
                     output = output.Replace("[Plural]", Plural)
                         .Replace("[ContextClass]", ContextClass)
                         .Replace("[Entity]", Entity);
